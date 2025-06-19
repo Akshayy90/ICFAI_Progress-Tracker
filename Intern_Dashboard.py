@@ -655,15 +655,15 @@ group_input_method = st.sidebar.radio(
 if group_input_method == "Single Group":
     group_id = st.sidebar.text_input(
         "🏢 GitLab Group ID", 
-        value="69994",
-        placeholder="Enter group ID (e.g., 69994)",
+        value="72165",
+        placeholder="Enter group ID (e.g., 72165)",
         help="Enter the GitLab group ID you want to analyze"
     )
     group_ids = [group_id] if group_id and group_id.isdigit() else []
 else:
     group_ids_text = st.sidebar.text_area(
         "🏢 GitLab Group IDs",
-        value="69994",
+        value="72165",
         placeholder="Enter group IDs, one per line:\n69994\n12345\n67890",
         help="Enter multiple group IDs, one per line"
     )
