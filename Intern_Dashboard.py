@@ -121,7 +121,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>📊  GitLab Analytics Dashboard</h1>
-    <p>BITS Pilani Internship - Comprehensive GitLab Contributions Analysis</p>
+    <p>ICFAI Internship - Comprehensive GitLab Contributions Analysis</p>
     <p style="font-size: 0.9em; opacity: 0.8;">Real-time activity tracking with enhanced user insights</p>
 </div>
 """, unsafe_allow_html=True)
