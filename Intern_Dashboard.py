@@ -207,23 +207,34 @@ debug_mode = st.sidebar.checkbox("🐛 Debug Mode", value=False, help="Show deta
 
 # API Helper Functions
 def get_gitlab_headers():
-    """Get GitLab API headers using only user-provided token from session state"""
+    """Get GitLab API headers with improved token handling"""
+    token = None
     
-    token = st.session_state.get('gitlab_token', None)
+    # Primary source: session state (user-provided token)
+    if st.session_state.get('gitlab_token'):
+        token = st.session_state.gitlab_token
+    else:
+        # Fallback to secrets/environment (for development)
+        try:
+            if hasattr(st, 'secrets') and "GITLAB_TOKEN" in st.secrets:
+                token = st.secrets["GITLAB_TOKEN"]
+        except Exception as e:
+            if debug_mode:
+                st.write(f"Secrets access error: {e}")
+        
+        # Try environment variable as last resort
+        if not token:
+            token = os.getenv("GITLAB_TOKEN")
     
     if not token:
-        st.error("❌ No GitLab token found. Please enter your token in the form above.")
-        st.stop()
-
-    # Optional: Warn if the token format looks suspicious
-    if not token.startswith(('glpat-', 'gloas-', 'gldt-')) or len(token) < 20:
-        st.warning("⚠️ The token format looks incorrect. It should typically start with 'glpat-', 'gloas-', or 'gldt-'.")
-
-    return {
-        "PRIVATE-TOKEN": token,
-        "Content-Type": "application/json"
-    }
-
+        return None
+    
+    # Validate token format for user guidance
+    if not token.startswith(('glpat-', 'gloas-', 'gldt-')) and len(token) < 20:
+        if debug_mode:
+            st.warning("⚠️ Token format looks incorrect. GitLab tokens usually start with 'glpat-', 'gloas-', or 'gldt-'")
+    
+    return {"PRIVATE-TOKEN": token, "Content-Type": "application/json"}
 
 def safe_api_request(url, headers, params=None, timeout=30, retries=3):
     """Make API request with enhanced error handling and retry logic"""
@@ -644,16 +655,16 @@ group_input_method = st.sidebar.radio(
 if group_input_method == "Single Group":
     group_id = st.sidebar.text_input(
         "🏢 GitLab Group ID", 
-        value="721654",
-        placeholder="Enter group ID (e.g., 721654)",
+        value="72165",
+        placeholder="Enter group ID (e.g., 72165)",
         help="Enter the GitLab group ID you want to analyze"
     )
     group_ids = [group_id] if group_id and group_id.isdigit() else []
 else:
     group_ids_text = st.sidebar.text_area(
         "🏢 GitLab Group IDs",
-        value="721654",
-        placeholder="Enter group IDs, one per line:\n721654\n12345\n67890",
+        value="72165",
+        placeholder="Enter group IDs, one per line:\n72165\n12345\n67890",
         help="Enter multiple group IDs, one per line"
     )
     group_ids = [gid.strip() for gid in group_ids_text.split('\n') if gid.strip() and gid.strip().isdigit()]
